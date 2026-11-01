@@ -1,7 +1,7 @@
 <resources>
     <string name="start_head_tracking">开始头部追踪</string>
     <string name="stop_head_tracking">停止头部追踪</string>
-    <string name="app_name" translatable="false">LibrePods Hyper</string>
+    <string name="app_name" translatable="false">LibrePods</string>
     <string name="apple_appearance">Apple 风格</string>
     <string name="app_description">让 AirPods 跳出 Apple 生态限制。</string>
     <string name="app_widget_description">在主屏幕上直接查看 AirPods 电量。</string>

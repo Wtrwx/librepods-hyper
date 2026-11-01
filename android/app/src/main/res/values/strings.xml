@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="start_head_tracking">Start head tracking</string>
     <string name="stop_head_tracking">Stop head tracking</string>
-    <string name="app_name" translatable="false">LibrePods Hyper</string>
+    <string name="app_name" translatable="false">LibrePods</string>
     <string name="app_description">Liberate your AirPods from Apple\'s ecosystem.</string>
     <string name="app_widget_description">See your AirPods battery status right from your home screen!</string>
     <string name="accessibility">Accessibility</string>
