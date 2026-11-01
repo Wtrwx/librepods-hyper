@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.kyant.backdrop.backdrops.LayerBackdrop
 import me.kavishdevar.librepods.R
 import me.kavishdevar.librepods.presentation.MaterialIcons
@@ -25,6 +26,8 @@ import me.kavishdevar.librepods.presentation.components.StyledScaffold
 import me.kavishdevar.librepods.presentation.theme.DesignSystem
 import me.kavishdevar.librepods.presentation.theme.LocalDesignSystem
 import me.kavishdevar.librepods.presentation.viewmodel.AirPodsViewModel
+import top.yukonga.miuix.kmp.basic.IconButton as MiuixIconButton
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 @Composable
 fun NavigationRoot(
@@ -48,7 +51,8 @@ fun NavigationRoot(
 
     val state by airPodsViewModel.uiState.collectAsState()
 
-    val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple
+    val designSystem = LocalDesignSystem.current
+    val m3eEnabled = designSystem != DesignSystem.Apple
 
     val title = when (currentScreen) {
         Screen.Onboarding -> ""
@@ -79,7 +83,20 @@ fun NavigationRoot(
     val actionButtons = when (currentScreen) {
         Screen.AirPodsSettings -> listOf<@Composable (backdrop: LayerBackdrop) -> Unit>(
                 { scaffoldBackdrop ->
-                    if (m3eEnabled) {
+                    if (designSystem == DesignSystem.Miuix) {
+                        MiuixIconButton(
+                            onClick = { backStack.add(Screen.AppSettings) },
+                            modifier = Modifier.size(40.dp),
+                            backgroundColor = MiuixTheme.colorScheme.background
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Settings,
+                                contentDescription = stringResource(R.string.settings),
+                                modifier = Modifier.size(24.dp),
+                                tint = MiuixTheme.colorScheme.onBackground
+                            )
+                        }
+                    } else if (m3eEnabled) {
                         FilledTonalIconButton(
                             onClick = { backStack.add(Screen.AppSettings) },
                             modifier = Modifier
@@ -104,7 +121,23 @@ fun NavigationRoot(
             )
         Screen.HeadTracking -> listOf<@Composable (backdrop: LayerBackdrop) -> Unit>(
             { scaffoldBackdrop ->
-                if (m3eEnabled) {
+                if (designSystem == DesignSystem.Miuix) {
+                    MiuixIconButton(
+                        onClick = {
+                            if (state.headTrackingActive) airPodsViewModel.stopHeadTracking()
+                            else airPodsViewModel.startHeadTracking()
+                        },
+                        modifier = Modifier.size(40.dp),
+                        backgroundColor = MiuixTheme.colorScheme.background
+                    ) {
+                        Icon(
+                            imageVector = if (state.headTrackingActive) MaterialIcons.pause else Icons.Default.PlayArrow,
+                            contentDescription = stringResource(if (state.headTrackingActive) R.string.stop_head_tracking else R.string.start_head_tracking),
+                            modifier = Modifier.size(24.dp),
+                            tint = MiuixTheme.colorScheme.onBackground
+                        )
+                    }
+                } else if (m3eEnabled) {
                     FilledTonalIconToggleButton(
                         checked = state.headTrackingActive,
                         onCheckedChange = { if (it) airPodsViewModel.startHeadTracking() else airPodsViewModel.stopHeadTracking() },

@@ -84,6 +84,14 @@ fun StyledListItem(
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null
 ) {
+    if (LocalDesignSystem.current == DesignSystem.Miuix) {
+        MiuixSettingsList(modifier = modifier, title = title) {
+            MiuixSettingsRow(Modifier, name, description, enabled, onClick, null,
+                orientation, leadingContent, trailingContent)
+        }
+        return
+    }
+
     val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple
     Column {
         title?.let {

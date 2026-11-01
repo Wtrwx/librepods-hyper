@@ -1,4 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="start_head_tracking">開始頭部追蹤</string>
+    <string name="stop_head_tracking">停止頭部追蹤</string>
     <string name="app_name" translatable="false">LibrePods Hyper</string>
     <string name="apple_appearance">Apple 風格</string>
     <string name="app_description">讓你的 AirPods 擺脫 Apple 生態系統的束縛。</string>
