@@ -25,15 +25,18 @@ target_link_libraries(bluetooth_socket
 
 set(XPOSED_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../xposed/cpp)
 
-add_library(l2c_fcr_hook SHARED
-        l2c_fcr_hook.cpp
-
+set(LIBREPODS_XZ_SOURCES
         xz/xz_crc32.c
         xz/xz_crc64.c
         xz/xz_sha256.c
         xz/xz_dec_stream.c
         xz/xz_dec_lzma2.c
         xz/xz_dec_bcj.c
+)
+
+add_library(l2c_fcr_hook SHARED
+        l2c_fcr_hook.cpp
+        ${LIBREPODS_XZ_SOURCES}
 )
 
 target_include_directories(l2c_fcr_hook PRIVATE
@@ -55,3 +58,18 @@ target_link_libraries(l2c_fcr_hook
         android
         log
 )
+
+option(LIBREPODS_BUILD_NATIVE_TESTS "Build standalone Android native regression tests" OFF)
+if (LIBREPODS_BUILD_NATIVE_TESTS)
+    add_executable(sdp_identity_hook_test
+            ../../test/cpp/sdp_identity_hook_test.cpp
+            ${LIBREPODS_XZ_SOURCES}
+    )
+    target_include_directories(sdp_identity_hook_test PRIVATE
+            $<TARGET_PROPERTY:l2c_fcr_hook,INCLUDE_DIRECTORIES>
+    )
+    target_compile_definitions(sdp_identity_hook_test PRIVATE
+            $<TARGET_PROPERTY:l2c_fcr_hook,COMPILE_DEFINITIONS>
+    )
+    target_link_libraries(sdp_identity_hook_test android log)
+endif ()

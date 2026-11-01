@@ -48,7 +48,7 @@ fun NavigationRoot(
 
     val state by airPodsViewModel.uiState.collectAsState()
 
-    val m3eEnabled = LocalDesignSystem.current == DesignSystem.Material
+    val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple
 
     val title = when (currentScreen) {
         Screen.Onboarding -> ""

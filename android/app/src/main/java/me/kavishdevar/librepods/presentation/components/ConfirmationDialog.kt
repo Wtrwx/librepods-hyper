@@ -86,7 +86,7 @@ fun ConfirmationDialog(
         exit = scaleOut(targetScale = 1.05f) + fadeOut()
     ) {
         when (LocalDesignSystem.current) {
-            DesignSystem.Material -> {
+            DesignSystem.Material, DesignSystem.Miuix -> {
                 BasicAlertDialog(
                     onDismissRequest = onDismiss,
                     properties = DialogProperties(

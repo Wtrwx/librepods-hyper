@@ -148,7 +148,7 @@ fun AirPodsSettingsRoute(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    val m3eEnabled = LocalDesignSystem.current == DesignSystem.Material
+    val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple
     val topPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + if (m3eEnabled) 0.dp else 84.dp
     val bottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 12.dp
 
@@ -640,7 +640,7 @@ fun AirPodsSettingsScreen(
             }
 
             when (LocalDesignSystem.current) {
-                DesignSystem.Material -> {
+                DesignSystem.Material, DesignSystem.Miuix -> {
                     val polygons = remember {
                         listOf(
                             MaterialShapes.Cookie9Sided,

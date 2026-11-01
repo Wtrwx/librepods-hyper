@@ -52,7 +52,7 @@ fun StyledInputField(
     singleLine: Boolean = true,
     forceApple: Boolean = false
 ) {
-    val m3eEnabled = LocalDesignSystem.current == DesignSystem.Material && !forceApple
+    val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple && !forceApple
 
     if(m3eEnabled) {
         TextField(

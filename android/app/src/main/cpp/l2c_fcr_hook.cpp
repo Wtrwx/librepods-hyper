@@ -42,6 +42,12 @@ static HookFunType hook_func = nullptr;
 static uint8_t (*original_l2c_fcr_chk_chan_modes)(void *) = nullptr;
 
 static tBTA_STATUS (*original_BTA_DmSetLocalDiRecord)(tSDP_DI_RECORD *, uint32_t *) = nullptr;
+static tBTA_STATUS (*original_QTI_DmSetLocalDiRecord)(tSDP_DI_RECORD *, uint32_t *) = nullptr;
+
+// AOSP sdp_db.cc: values are copied synchronously from a big-endian byte stream.
+using SdpAddAttribute = bool (*)(uint32_t, uint16_t, uint8_t, uint32_t, uint8_t *);
+static SdpAddAttribute sdpAddAttribute = nullptr;
+static SdpAddAttribute qtiSdpAddAttribute = nullptr;
 
 static std::atomic<bool> enableSdpHook(false);
 
@@ -55,27 +61,61 @@ uint8_t fake_l2c_fcr_chk_chan_modes(void *p_ccb) {
     return 1;
 }
 
-tBTA_STATUS fake_BTA_DmSetLocalDiRecord(tSDP_DI_RECORD *p_device_info, uint32_t *p_handle) {
-
-    LOGI("fake_BTA_DmSetLocalDiRecord called");
-
-    if (original_BTA_DmSetLocalDiRecord &&
-        enableSdpHook.load(std::memory_order_relaxed))
-        original_BTA_DmSetLocalDiRecord(p_device_info, p_handle);
-
-    LOGI("fake_BTA_DmSetLocalDiRecord: modifying vendor to 0x004C, vendor_id_source to 0x0001");
-
-    if (p_device_info) {
-        p_device_info->vendor = 0x004C;
-        p_device_info->vendor_id_source = 0x0001;
+static void advertiseTipiCapability(uint32_t handle, SdpAddAttribute add_attribute) {
+    if (!add_attribute) {
+        LOGE("TiPi SDP capability unavailable: SDP_AddAttribute was not resolved");
+        return;
     }
 
-    LOGI("fake_BTA_DmSetLocalDiRecord: returning status %d",
-         original_BTA_DmSetLocalDiRecord ? original_BTA_DmSetLocalDiRecord(p_device_info, p_handle)
-                                         : BTA_FAILURE);
-    return original_BTA_DmSetLocalDiRecord ? original_BTA_DmSetLocalDiRecord(p_device_info,
-                                                                             p_handle)
-                                           : BTA_FAILURE;
+    // iOS 16 bluetoothd: local DID setup at sub_1003EB5EC, registration at
+    // sub_1000CCDB0, and TiPi feature 31 at sub_10038A964. Its OI_UINT64 is
+    // {ms32, ls32}; the ls32 low bit becomes the final byte on the wire.
+    // Advertise only the implemented TiPi support, not the complete iOS mask.
+    uint8_t features[] = {0, 0, 0, 0};
+    uint8_t version[] = {0, 1};
+    uint8_t extended_features[] = {0, 0, 0, 0, 0, 0, 0, 1};
+    constexpr uint8_t unsigned_integer = 1;
+    const bool added =
+            add_attribute(handle, 0xA000, unsigned_integer, sizeof(features), features) &&
+            add_attribute(handle, 0xAFFF, unsigned_integer, sizeof(version), version) &&
+            add_attribute(handle, 0xA001, unsigned_integer, sizeof(extended_features), extended_features);
+    LOGI("TiPi SDP capability registered=%d handle=0x%x", added, handle);
+}
+
+static tBTA_STATUS setLocalDiRecord(tSDP_DI_RECORD *p_device_info, uint32_t *p_handle,
+                                  decltype(original_BTA_DmSetLocalDiRecord) original,
+                                  SdpAddAttribute add_attribute) {
+    if (!original) {
+        LOGE("fake_BTA_DmSetLocalDiRecord: original function unavailable");
+        return BTA_FAILURE;
+    }
+
+    const bool spoof_apple = enableSdpHook.load(std::memory_order_relaxed) && p_device_info;
+    tSDP_DI_RECORD device_info{};
+    if (spoof_apple) {
+        // Registration consumes the record synchronously; keep the caller's identity intact.
+        device_info = *p_device_info;
+        device_info.vendor = 0x004C;
+        device_info.vendor_id_source = 0x0001;
+        p_device_info = &device_info;
+    }
+
+    // Registration has side effects. In particular, logging must not invoke it again.
+    const tBTA_STATUS status = original(p_device_info, p_handle);
+    if (spoof_apple && device_info.primary_record && status == BTA_SUCCESS &&
+        p_handle && *p_handle) {
+        advertiseTipiCapability(*p_handle, add_attribute);
+    }
+    LOGI("fake_BTA_DmSetLocalDiRecord: spoof_apple=%d, status=%d", spoof_apple, status);
+    return status;
+}
+
+tBTA_STATUS fake_BTA_DmSetLocalDiRecord(tSDP_DI_RECORD *record, uint32_t *handle) {
+    return setLocalDiRecord(record, handle, original_BTA_DmSetLocalDiRecord, sdpAddAttribute);
+}
+
+static tBTA_STATUS fake_QTI_DmSetLocalDiRecord(tSDP_DI_RECORD *record, uint32_t *handle) {
+    return setLocalDiRecord(record, handle, original_QTI_DmSetLocalDiRecord, qtiSdpAddAttribute);
 }
 
 static bool decompressXZ(const uint8_t *input, size_t input_size, std::vector<uint8_t> &output) {
@@ -195,7 +235,8 @@ static uintptr_t getModuleBase(const char *name) {
 }
 
 static uint64_t
-findSymbolOffsetDynsym(const std::vector<uint8_t> &elf, const char *symbol_substring) {
+findSymbolOffsetDynsym(const std::vector<uint8_t> &elf, const char *symbol_substring,
+                      bool prefix_only = false) {
 
     LOGI("findSymbolOffsetDynsym called with %s", symbol_substring);
 
@@ -236,7 +277,10 @@ findSymbolOffsetDynsym(const std::vector<uint8_t> &elf, const char *symbol_subst
     for (size_t i = 0; i < count; ++i) {
         const char *name = strings + symbols[i].st_name;
 
-        if (strstr(name, symbol_substring) && ELF64_ST_TYPE(symbols[i].st_info) == STT_FUNC) {
+        const bool matches = prefix_only ? !strncmp(name, symbol_substring, strlen(symbol_substring))
+                                         : strstr(name, symbol_substring) != nullptr;
+        if (matches && symbols[i].st_shndx != SHN_UNDEF &&
+            ELF64_ST_TYPE(symbols[i].st_info) == STT_FUNC) {
 
             LOGI("findSymbolOffsetDynsym: matched %s @ 0x%lx", name,
                  (unsigned long) symbols[i].st_value);
@@ -249,7 +293,8 @@ findSymbolOffsetDynsym(const std::vector<uint8_t> &elf, const char *symbol_subst
     return 0;
 }
 
-static uint64_t findSymbolOffset(const std::vector<uint8_t> &elf, const char *symbol_substring) {
+static uint64_t findSymbolOffset(const std::vector<uint8_t> &elf, const char *symbol_substring,
+                                 bool prefix_only = false) {
 
     LOGI("findSymbolOffset called with symbol_substring: %s", symbol_substring);
 
@@ -290,7 +335,10 @@ static uint64_t findSymbolOffset(const std::vector<uint8_t> &elf, const char *sy
     for (size_t i = 0; i < count; ++i) {
         const char *name = strings + symbols[i].st_name;
 
-        if (strstr(name, symbol_substring) && ELF64_ST_TYPE(symbols[i].st_info) == STT_FUNC) {
+        const bool matches = prefix_only ? !strncmp(name, symbol_substring, strlen(symbol_substring))
+                                         : strstr(name, symbol_substring) != nullptr;
+        if (matches && symbols[i].st_shndx != SHN_UNDEF &&
+            ELF64_ST_TYPE(symbols[i].st_info) == STT_FUNC) {
 
             LOGI("findSymbolOffset: matched symbol %s at 0x%lx", name,
                  (unsigned long) symbols[i].st_value);
@@ -345,6 +393,7 @@ static bool hookLibrary(const char *libname) {
 
     uint64_t chk_offset = 0;
     uint64_t sdp_offset = 0;
+    uint64_t add_attribute_offset = 0;
 
     for (int i = 0; i < eh->e_shnum; ++i) {
         if (!strcmp(shstr + shdr[i].sh_name, ".gnu_debugdata")) {
@@ -360,6 +409,9 @@ static bool hookLibrary(const char *libname) {
                 chk_offset = findSymbolOffset(decompressed, "l2c_fcr_chk_chan_modes");
 
                 sdp_offset = findSymbolOffset(decompressed, "BTA_DmSetLocalDiRecord");
+                // The mangled name length excludes SDP_AddAttributeToRecord,
+                // whose first argument is a record pointer rather than a handle.
+                add_attribute_offset = findSymbolOffset(decompressed, "_Z16SDP_AddAttribute", true);
             } else {
                 LOGE("debugdata decompress failed");
             }
@@ -377,6 +429,9 @@ static bool hookLibrary(const char *libname) {
         LOGI("fallback dynsym sdp");
         sdp_offset = findSymbolOffsetDynsym(file, "BTA_DmSetLocalDiRecord");
     }
+    if (!add_attribute_offset) {
+        add_attribute_offset = findSymbolOffsetDynsym(file, "_Z16SDP_AddAttribute", true);
+    }
 
     uintptr_t base = getModuleBase(libname);
     if (!base) {
@@ -392,10 +447,21 @@ static bool hookLibrary(const char *libname) {
     }
 
     if (sdp_offset) {
-        void *target = reinterpret_cast<void *>(base + sdp_offset);
-        hook_func(target, (void *) fake_BTA_DmSetLocalDiRecord,
-                  (void **) &original_BTA_DmSetLocalDiRecord);
-        LOGI("hooked sdp");
+        // Resolve the writer and registration entry point from the same stack.
+        // JNI and QTI libraries can coexist and must retain separate originals.
+        const bool qti = !strcmp(libname, "libbluetooth_qti.so");
+        auto &original = qti ? original_QTI_DmSetLocalDiRecord : original_BTA_DmSetLocalDiRecord;
+        auto &add_attribute = qti ? qtiSdpAddAttribute : sdpAddAttribute;
+        if (!original) {
+            add_attribute = add_attribute_offset
+                    ? reinterpret_cast<SdpAddAttribute>(base + add_attribute_offset) : nullptr;
+            void *target = reinterpret_cast<void *>(base + sdp_offset);
+            void *replacement = qti ? (void *) fake_QTI_DmSetLocalDiRecord
+                                    : (void *) fake_BTA_DmSetLocalDiRecord;
+            const int result = hook_func(target, replacement, (void **) &original);
+            LOGI("SDP hook result=%d tipi_writer=%d stack=%s", result,
+                 add_attribute != nullptr, libname);
+        }
     }
 
     return chk_offset || sdp_offset;

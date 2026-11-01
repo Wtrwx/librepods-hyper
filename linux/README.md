@@ -214,3 +214,4 @@ It is possible that the AirPods disconnect after a short period of time and play
 Because I discovered that QBluetooth doesn't support connecting to a socket with its PSM, only a UUID can be used. I could add a dependency on BlueZ, but then having two bluetooth interfaces seems unnecessary. So, I decided to use a separate script for hearing aid features. In the future, QBluetooth will be replaced with BlueZ native calls, and then everything will be in one application.
 
 </details>
+> 本目录保留上游 LibrePods 的 Linux 实现与参考说明。LibrePods Hyper 当前新增的 MIUIx 界面、多设备连接修复及小米系统集成面向 Android，见[项目首页](../README.md)。

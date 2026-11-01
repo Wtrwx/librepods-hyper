@@ -4,6 +4,56 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class SmartRoutingStateTest {
+    @Test fun confirmedPhoneSourceDoesNotStartAnotherClaimWhenOwnershipIsUnknown() {
+        var now = 0L
+        val state = SmartRoutingState { now }
+        state.remote()
+        state.confirmLocalSource()
+        val confirmed = state.generation
+        // Reproduce the playback callback after the phone's MEDIA source notification.
+        if (state.needsTakeover(ownsConnection = false, audioSourceIsOtherDevice = false)) {
+            state.requestLocal(resumeMedia = true)
+        }
+        now += SmartRoutingState.CLAIM_TIMEOUT_MS
+        assertEquals(confirmed, state.generation)
+        assertFalse(state.isPending(confirmed))
+        assertEquals(SmartRoutingState.Owner.LOCAL, state.owner)
+    }
+
+    @Test fun realRemoteEvidenceStillRequiresTakeoverDespiteEarlierLocalConfirmation() {
+        val state = SmartRoutingState()
+        assertTrue(state.needsTakeover(false, false)) // cold, unknown route
+        state.confirmLocalSource()
+        assertTrue(state.needsTakeover(true, true)) // current source is another host
+        state.remote()
+        assertTrue(state.needsTakeover(true, false)) // stale ownership must not undo handoff
+    }
+
+    @Test fun actualPlaybackCompletesPendingClaimWithoutAnOwnershipAck() {
+        var now = 0L
+        val state = SmartRoutingState { now }
+        val claim = state.requestLocal(resumeMedia = true)
+        assertTrue(state.confirmLocalPlayback(claim))
+        assertTrue(state.consumeResume(claim, true))
+        assertFalse(state.consumeResume(claim, true))
+        now += SmartRoutingState.CLAIM_TIMEOUT_MS
+        assertFalse(state.isPending(claim)) // the timeout must not yield and pause
+        assertFalse(state.needsTakeover(false, false))
+    }
+
+    @Test fun playbackCannotReviveARemoteDisconnectedOrSupersededClaim() {
+        val state = SmartRoutingState()
+        assertFalse(state.confirmLocalPlayback(state.generation)) // no authorized claim
+        val claim = state.requestLocal()
+        state.remote()
+        assertFalse(state.confirmLocalPlayback(claim))
+        assertFalse(state.confirmLocalPlayback(state.generation))
+        state.requestLocal()
+        assertFalse(state.confirmLocalPlayback(claim))
+        state.reset()
+        assertFalse(state.confirmLocalPlayback(state.generation))
+    }
+
     @Test fun remoteHandoffInvalidatesOldLocalWorkWithoutATimeoutReclaim() {
         var now = 0L
         val state = SmartRoutingState { now }

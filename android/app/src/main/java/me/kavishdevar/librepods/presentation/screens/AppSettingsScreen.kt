@@ -119,7 +119,7 @@ fun AppSettingsScreen(
     val subjectFocusRequester = remember { FocusRequester() }
     val descriptionFocusRequester = remember { FocusRequester() }
 
-    val m3eEnabled = LocalDesignSystem.current == DesignSystem.Material
+    val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple
     val topPadding = if (m3eEnabled) 16.dp else WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + 84.dp
     val bottomPadding = if (m3eEnabled) 0.dp else WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 12.dp
 
@@ -185,13 +185,20 @@ fun AppSettingsScreen(
             }
         }
 
-        StyledToggle(
-            title = stringResource(R.string.appearance),
-            label = stringResource(R.string.use_material3e),
-            checked = state.m3eEnabled,
-            onCheckedChange = viewModel::setm3eEnabled,
-            enabled = state.isPremium
-        )
+        StyledList(title = stringResource(R.string.appearance)) {
+            listOf(
+                DesignSystem.Miuix to stringResource(R.string.miuix),
+                DesignSystem.Material to stringResource(R.string.material3e),
+                DesignSystem.Apple to stringResource(R.string.apple_appearance)
+            ).forEach { (designSystem, label) ->
+                StyledListItem(
+                    name = label,
+                    selected = state.designSystem == designSystem,
+                    onClick = { viewModel.setDesignSystem(designSystem) }
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
 
         if (state.connectionSuccessful) {
             StyledToggle(
@@ -437,7 +444,7 @@ fun AppSettingsScreen(
                             else -> "GitHub"
                         }
                     )
-                    val url = "https://github.com/kavishdevar/librepods/issues/new" +
+                    val url = "https://github.com/Wtrwx/librepods-hyper/issues/new" +
                         "?template=01-bug-report-android.yml" +
                         "&app-source=$appSource" +
                         "&app-version=$appVersion" +

@@ -13,6 +13,9 @@ import kotlinx.coroutines.launch
 import me.kavishdevar.librepods.BuildConfig
 import me.kavishdevar.librepods.billing.BillingManager
 import me.kavishdevar.librepods.data.XposedRemotePrefProvider
+import me.kavishdevar.librepods.presentation.theme.DesignSystem
+import me.kavishdevar.librepods.presentation.theme.DESIGN_SYSTEM_PREF
+import me.kavishdevar.librepods.presentation.theme.readDesignSystem
 import kotlin.math.roundToInt
 
 data class AppSettingsUiState(
@@ -39,7 +42,7 @@ data class AppSettingsUiState(
     val showBottomSheetPopup: Boolean = true,
     val showIslandPopup: Boolean = true,
     val timeUntilFOSSPremiumExpiry: Long = 0L,
-    val m3eEnabled: Boolean = false
+    val designSystem: DesignSystem = DesignSystem.Miuix
 )
 
 class AppSettingsViewModel(application: Application) : AndroidViewModel(application) {
@@ -158,7 +161,7 @@ class AppSettingsViewModel(application: Application) : AndroidViewModel(applicat
                 connectionSuccessful = sharedPreferences.getBoolean("connection_successful", false),
                 showBottomSheetPopup = sharedPreferences.getBoolean("show_bottom_sheet_popup", true),
                 showIslandPopup = sharedPreferences.getBoolean("show_island_popup", true),
-                m3eEnabled = sharedPreferences.getBoolean("m3e_enabled", true)
+                designSystem = readDesignSystem(sharedPreferences)
             )
         }
     }
@@ -269,8 +272,11 @@ class AppSettingsViewModel(application: Application) : AndroidViewModel(applicat
         _uiState.update { it.copy(showIslandPopup = enabled) }
     }
 
-    fun setm3eEnabled(enabled: Boolean) {
-        sharedPreferences.edit { putBoolean("m3e_enabled", enabled) }
-        _uiState.update { it.copy(m3eEnabled = enabled) }
+    fun setDesignSystem(designSystem: DesignSystem) {
+        sharedPreferences.edit {
+            putString(DESIGN_SYSTEM_PREF, designSystem.preferenceValue)
+            putBoolean("m3e_enabled", designSystem == DesignSystem.Material)
+        }
+        _uiState.update { it.copy(designSystem = designSystem) }
     }
 }

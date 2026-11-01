@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="640" viewBox="0 0 1600 640" role="img" aria-labelledby="title desc">
+  <title id="title">LibrePods Hyper</title>
+  <desc id="desc">One pair. More freedom. Earbuds connect Android and iPhone, with smart routing, HyperOS integration and MIUIx.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101d2c"/><stop offset="1" stop-color="#080e17"/></linearGradient>
+    <linearGradient id="accent" x2="1" y2="1"><stop stop-color="#a5f2cf"/><stop offset="1" stop-color="#43d9bc"/></linearGradient>
+    <linearGradient id="pod" x2="1" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#b7cad5"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#43d9bc" stop-opacity=".13"/><stop offset="1" stop-color="#43d9bc" stop-opacity="0"/></radialGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#b4cde0" opacity=".09"/></pattern>
+  </defs>
+  <rect width="1600" height="640" rx="32" fill="url(#bg)"/>
+  <rect x="800" width="800" height="640" rx="32" fill="url(#dots)"/>
+  <circle cx="1190" cy="330" r="330" fill="url(#glow)"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <g transform="translate(80 68)">
+      <rect width="42" height="42" rx="12" fill="url(#accent)"/>
+      <path d="M13 11v20m16-20v20M13 21h16" fill="none" stroke="#102a2b" stroke-width="5" stroke-linecap="round"/>
+      <text x="58" y="27" fill="#a2b5c9" font-size="16" font-weight="700" letter-spacing="3">AIRPODS. CONNECTED.</text>
+    </g>
+    <text x="76" y="243" fill="#f0f5fa" font-size="88" font-weight="700" letter-spacing="-4">LibrePods</text>
+    <text x="76" y="341" fill="url(#accent)" font-size="100" font-weight="700" letter-spacing="-4">Hyper</text>
+    <text x="82" y="402" fill="#afc0d1" font-size="28">One pair. More freedom.</text>
+    <g fill="#142c33" stroke="#31534e">
+      <rect x="80" y="482" width="190" height="46" rx="23"/>
+      <rect x="282" y="482" width="156" height="46" rx="23"/>
+      <rect x="450" y="482" width="118" height="46" rx="23"/>
+    </g>
+    <g fill="#c3e9de" font-size="16" font-weight="700" text-anchor="middle">
+      <text x="175" y="511">SMART ROUTING</text><text x="360" y="511">HYPEROS</text><text x="509" y="511">MIUIx</text>
+    </g>
+    <text x="83" y="584" fill="#6c859e" font-size="15" letter-spacing="1">COMMUNITY BUILT · OPEN SOURCE</text>
+    <g fill="none" stroke="#48cdb0" stroke-width="2" stroke-linecap="round" stroke-dasharray="7 10" opacity=".65">
+      <path d="M1051 243C1131 136 1230 154 1332 245"/>
+      <path d="M1333 348C1250 468 1135 488 1050 380"/>
+    </g>
+    <g transform="translate(882 144)">
+      <rect width="164" height="304" rx="30" fill="#172434" stroke="#41566b" stroke-width="2"/>
+      <rect x="11" y="14" width="142" height="276" rx="22" fill="#101a28"/>
+      <rect x="62" y="11" width="40" height="5" rx="2.5" fill="#526b80"/>
+      <text x="82" y="65" fill="#d1deea" font-size="18" text-anchor="middle">Android</text>
+      <path d="M45 135v23M64 117v59M83 103v87M102 120v54M121 135v23" fill="none" stroke="#6ce0ba" stroke-width="6" stroke-linecap="round"/>
+      <rect x="29" y="222" width="106" height="30" rx="15" fill="#173c35"/>
+      <text x="82" y="242" fill="#a0ebcb" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="1">PLAYING</text>
+    </g>
+    <g transform="translate(1336 104)">
+      <rect width="164" height="304" rx="30" fill="#202434" stroke="#535b79" stroke-width="2"/>
+      <rect x="11" y="14" width="142" height="276" rx="22" fill="#141a2a"/>
+      <rect x="54" y="18" width="56" height="13" rx="6.5" fill="#080d16"/>
+      <text x="82" y="65" fill="#d1deea" font-size="18" text-anchor="middle">iPhone</text>
+      <circle cx="82" cy="145" r="35" fill="#273047"/>
+      <path d="m73 128 26 17-26 17Z" fill="#a8b5d1"/>
+      <rect x="29" y="222" width="106" height="30" rx="15" fill="#252e43"/>
+      <text x="82" y="242" fill="#a7b9d2" font-size="12" font-weight="700" text-anchor="middle" letter-spacing="1">READY</text>
+    </g>
+    <circle cx="1190" cy="330" r="113" fill="#142e32" stroke="#387364" stroke-width="2"/>
+    <circle cx="1190" cy="330" r="98" fill="#153135" stroke="#26564e"/>
+    <g transform="translate(1129 275) rotate(-12 24 55)">
+      <rect x="15" y="34" width="20" height="79" rx="10" fill="url(#pod)"/>
+      <ellipse cx="24" cy="28" rx="29" ry="26" fill="url(#pod)"/>
+      <ellipse cx="13" cy="25" rx="7" ry="11" fill="#29414b"/>
+      <rect x="21" y="92" width="8" height="3" rx="1.5" fill="#63848c"/>
+    </g>
+    <g transform="translate(1200 275) rotate(12 24 55)">
+      <rect x="15" y="34" width="20" height="79" rx="10" fill="url(#pod)"/>
+      <ellipse cx="24" cy="28" rx="29" ry="26" fill="url(#pod)"/>
+      <ellipse cx="35" cy="25" rx="7" ry="11" fill="#29414b"/>
+      <rect x="21" y="92" width="8" height="3" rx="1.5" fill="#63848c"/>
+    </g>
+    <text x="1190" y="493" fill="#d7e7e8" font-size="19" font-weight="700" text-anchor="middle" letter-spacing="3">AIRPODS</text>
+    <text x="1190" y="528" fill="#7c9eab" font-size="17" text-anchor="middle">Two devices. One seamless flow.</text>
+  </g>
+</svg>

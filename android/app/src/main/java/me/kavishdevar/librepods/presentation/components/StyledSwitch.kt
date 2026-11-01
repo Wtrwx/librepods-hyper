@@ -83,6 +83,12 @@ fun StyledSwitch(
     onCheckedChange: (Boolean) -> Unit,
     enabled: Boolean = true,
 ) {
+    if (me.kavishdevar.librepods.presentation.theme.LocalDesignSystem.current ==
+        me.kavishdevar.librepods.presentation.theme.DesignSystem.Miuix) {
+        top.yukonga.miuix.kmp.basic.Switch(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
+        return
+    }
+
     val isDarkTheme = isSystemInDarkTheme()
     val haptics = LocalHapticFeedback.current
 

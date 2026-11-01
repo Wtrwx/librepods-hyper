@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name" translatable="false">LibrePods</string>
+    <string name="app_name" translatable="false">LibrePods Hyper</string>
+    <string name="apple_appearance">Apple 风格</string>
     <string name="app_description">让 AirPods 跳出 Apple 生态限制。</string>
     <string name="app_widget_description">在主屏幕上直接查看 AirPods 电量。</string>
     <string name="accessibility">辅助功能</string>
@@ -160,7 +161,7 @@
     <string name="use_alternate_head_tracking_packets_description">如果头部追踪无法使用，请开启此项。它会向 AirPods 发送不同数据，用于请求或停止头部追踪数据。</string>
     <string name="act_as_an_apple_device">模拟为 Apple 设备</string>
     <string name="act_as_an_apple_device_description">模拟 Apple 蓝牙身份以启用多设备连接。自动切换和辅助听力控制可在下方分别开启。</string>
-    <string name="act_as_an_apple_device_warning">此功能可能不稳定。AirPods 最多可同时连接两台设备。如果你要搭配 iPad 或 Mac 等 Apple 设备使用，请先连接该设备，再连接 Android。</string>
+    <string name="act_as_an_apple_device_warning">多设备连接最多支持两台主机，兼容性取决于耳机固件和手机蓝牙栈。修改身份设置后，请重新加载蓝牙并连接耳机。</string>
     <string name="vendor_att_socket">辅助听力控制通道</string>
     <string name="vendor_att_socket_description">部分听力和自定通透设置需要此通道。默认关闭以改善 Mac 与 Android 同时连接的稳定性；更改后请重新连接耳机。</string>
     <string name="smart_routing_auto_takeover">允许 Smart Routing 自动切换</string>
@@ -232,7 +233,7 @@
     <string name="automatic_connection_description">启用并自定 AirPods 自动连接。</string>
     <string name="customizations_description">获取 App 自定选项，包括在小组件中显示手机电量、对话感知音量，以及更多即将推出的自定功能。</string>
     <string name="support_the_development">支持开发</string>
-    <string name="support_development_description">LibrePods 由一名开发者维护。升级可帮助 App 持续开发。</string>
+    <string name="support_development_description">LibrePods Hyper 是社区维护的 LibrePods 衍生项目，由开源贡献者共同完善。</string>
     <string name="feature_availability_disclaimer">功能可用性取决于你的 AirPods 型号和固件版本。</string>
     <string name="contact">联系</string>
     <string name="email">电子邮件</string>

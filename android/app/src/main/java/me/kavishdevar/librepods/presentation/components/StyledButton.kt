@@ -95,8 +95,25 @@ fun StyledButton(
     materialButtonStyle: MaterialButtonStyle = MaterialButtonStyle.Tonal, // picking tonal because most usages assume a transparent/gray background, tonal will give a slightly less vibrant background
     content: @Composable RowScope.() -> Unit,
 ) {
+    if (LocalDesignSystem.current == DesignSystem.Miuix) {
+        val primary = materialButtonStyle == MaterialButtonStyle.Filled ||
+            surfaceColor == androidx.compose.material3.MaterialTheme.colorScheme.primary
+        top.yukonga.miuix.kmp.basic.Button(
+            modifier = modifier,
+            onClick = onClick,
+            enabled = enabled,
+            colors = if (primary) top.yukonga.miuix.kmp.basic.ButtonDefaults.buttonColorsPrimary()
+                else top.yukonga.miuix.kmp.basic.ButtonDefaults.buttonColors(
+                    color = if (surfaceColor != Color.Unspecified) surfaceColor
+                        else top.yukonga.miuix.kmp.theme.MiuixTheme.colorScheme.secondaryVariant
+                ),
+            content = content
+        )
+        return
+    }
+
     when (LocalDesignSystem.current) {
-        DesignSystem.Material -> {
+        DesignSystem.Material, DesignSystem.Miuix -> {
             when (materialButtonStyle) {
                 MaterialButtonStyle.Filled -> {
                     Button(

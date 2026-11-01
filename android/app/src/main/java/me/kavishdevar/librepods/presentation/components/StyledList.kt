@@ -34,8 +34,14 @@ fun StyledList(
 ) {
     val scope = StyledListScope()
     scope.content()
+    if (LocalDesignSystem.current == DesignSystem.Miuix) {
+        MiuixSettingsList(modifier, title, description) {
+            scope.items.forEachIndexed { index, item -> item(index, scope.items.size) }
+        }
+        return
+    }
 
-    val m3eEnabled = LocalDesignSystem.current == DesignSystem.Material
+    val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple
 
     Column (modifier = modifier) {
         title?.let {

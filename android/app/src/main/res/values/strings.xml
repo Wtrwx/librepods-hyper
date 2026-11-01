@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name" translatable="false">LibrePods</string>
+    <string name="app_name" translatable="false">LibrePods Hyper</string>
     <string name="app_description">Liberate your AirPods from Apple\'s ecosystem.</string>
     <string name="app_widget_description">See your AirPods battery status right from your home screen!</string>
     <string name="accessibility">Accessibility</string>
@@ -160,7 +160,7 @@
     <string name="use_alternate_head_tracking_packets_description">Enable this if head tracking doesn\'t work for you. This sends different data to AirPods for requesting/stopping head tracking data.</string>
     <string name="act_as_an_apple_device">Act as an Apple device</string>
     <string name="act_as_an_apple_device_description">Advertise an Apple Bluetooth identity for multi-device connectivity. The two riskier behaviors below can be enabled separately.</string>
-    <string name="act_as_an_apple_device_warning">Might be unstable!! A maximum of two devices can be connected to your AirPods. If you are using with an Apple device like an iPad or Mac, then please connect that device first and then your Android.</string>
+    <string name="act_as_an_apple_device_warning">Multi-device connectivity supports up to two hosts and depends on your AirPods firmware and Bluetooth stack. Reload Bluetooth and reconnect after changing the identity setting.</string>
     <string name="vendor_att_socket">Accessibility control channel</string>
     <string name="vendor_att_socket_description">Needed for some hearing and custom transparency settings. Disabled by default for Mac + Android connection stability. Reconnect your AirPods after changing this setting.</string>
     <string name="smart_routing_auto_takeover">Allow automatic Smart Routing takeover</string>
@@ -232,7 +232,7 @@
     <string name="automatic_connection_description">Enable and customize automatic connection to AirPods.</string>
     <string name="customizations_description">Get access to app customizations, including phone battery in widget, conversational awareness volume, and many more upcoming customization features.</string>
     <string name="support_the_development">Support the development</string>
-    <string name="support_development_description">LibrePods is developed by a single developer. Upgrading helps keep the app alive.</string>
+    <string name="support_development_description">LibrePods Hyper is a community-maintained fork of LibrePods. Open-source contributors make its development possible.</string>
     <string name="feature_availability_disclaimer">Feature availability depends on your AirPods model and firmware version.</string>
     <string name="contact">Contact</string>
     <string name="email">E-Mail</string>
@@ -284,6 +284,8 @@
     <string name="custom">Custom</string>
     <string name="recommended">Recommended</string>
     <string name="appearance">Appearance</string>
+    <string name="miuix" translatable="false">MIUIx</string>
+    <string name="apple_appearance">Apple</string>
     <string name="use_material3e">Use Material 3 Expressive</string>
     <string name="material3e">Material 3 Expressive</string>
     <string name="update_m3e_description">LibrePods now supports a whole new look based on Material 3 Expressive including updated typography and adaptive color schemes.\nYou can switch back to the Apple look from the app\'s settings.</string>

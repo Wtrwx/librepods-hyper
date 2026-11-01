@@ -21,6 +21,8 @@
 package me.kavishdevar.librepods.utils
 
 import android.content.SharedPreferences
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.AudioPlaybackConfiguration
 import android.os.Build
@@ -50,6 +52,42 @@ object MediaController {
     private const val PLAYBACK_DEBOUNCE_MS = 300L
     private var lastPlaybackCallbackAt: Long = 0L
     private var lastKnownIsMusicActive: Boolean? = null
+    private var remoteAudioFocusRequest: AudioFocusRequest? = null
+
+    private fun releaseRemoteAudioFocus() {
+        val request = remoteAudioFocusRequest ?: return
+        remoteAudioFocusRequest = null
+        audioManager.abandonAudioFocusRequest(request)
+    }
+
+    private fun holdRemoteAudioFocus() {
+        if (!this::audioManager.isInitialized || remoteAudioFocusRequest != null) return
+        val request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+            .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
+            .setOnAudioFocusChangeListener({ change ->
+                if (remoteAudioFocusRequest == null) return@setOnAudioFocusChangeListener
+                if (change == AudioManager.AUDIOFOCUS_LOSS || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                    val playbackWasStopped = lastKnownIsMusicActive != true
+                    releaseRemoteAudioFocus()
+                    // A new Android player claiming permanent focus is a fresh local
+                    // intent, even before its first AudioTrack starts producing audio.
+                    if (change == AudioManager.AUDIOFOCUS_LOSS && pausedForOtherDevice && playbackWasStopped) {
+                        lastKnownIsMusicActive = false
+                        Log.d("MediaController", "New local audio focus while remote owns the route")
+                        ServiceManager.getService()?.takeOver("music", localPlaybackIntent = true)
+                    }
+                }
+            }, handler)
+            .build()
+        remoteAudioFocusRequest = request
+        val result = runCatching { audioManager.requestAudioFocus(request) }.getOrElse {
+            Log.w("MediaController", "Cannot hold remote audio focus: ${it.message}")
+            AudioManager.AUDIOFOCUS_REQUEST_FAILED
+        }
+        if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) remoteAudioFocusRequest = null
+        Log.d("MediaController", "Remote audio focus result: $result")
+    }
 
     private const val OWNERSHIP_RETRY_MS = 3200L
     private var deferredTakeoverGeneration = -1L
@@ -62,7 +100,7 @@ object MediaController {
         val service = ServiceManager.getService() ?: return@Runnable
         if (service.routingGeneration() != deferredTakeoverGeneration) return@Runnable
         Log.d("MediaController", "Deferred take-over after ownership-loss guard")
-        if (!pausedWhileTakingOver) service.takeOver("music")
+        if (!pausedWhileTakingOver) service.takeOver("music", localPlaybackIntent = true)
     }
 
     private var relativeVolume: Boolean = false
@@ -110,71 +148,63 @@ object MediaController {
             super.onPlaybackConfigChanged(configs)
             val now = SystemClock.uptimeMillis()
             val isActive = audioManager.isMusicActive
+            // Short-video players commonly use USAGE_MEDIA with CONTENT_TYPE_UNKNOWN.
+            // UI sounds share the music stream but must not hide a new media start.
+            val hasMediaPlayback = configs.orEmpty().any { config ->
+                val attrs = config.audioAttributes
+                attrs.usage == AudioAttributes.USAGE_MEDIA ||
+                    attrs.contentType == AudioAttributes.CONTENT_TYPE_MUSIC ||
+                    attrs.contentType == AudioAttributes.CONTENT_TYPE_MOVIE
+            }
+            val mediaActive = isActive && hasMediaPlayback
+            ServiceManager.getService()?.updateTipiScore(mediaActive)
+            val playbackStarted = mediaActive && lastKnownIsMusicActive != true
             Log.d("MediaController", "Playback config changed, iPausedTheMedia: $iPausedTheMedia, isActive: $isActive, pausedForOtherDevice: $pausedForOtherDevice, lastKnownIsMusicActive: $lastKnownIsMusicActive")
 
             if (!isActive && lastPlayWithReplay && now - lastPlayTime < 2500L) {
                 Log.d("MediaController", "Music paused shortly after play with replay; retrying play")
                 lastPlayWithReplay = false
                 sendPlay()
-                lastKnownIsMusicActive = true
+                lastKnownIsMusicActive = mediaActive
                 return
             }
 
-            if (now - lastPlaybackCallbackAt < PLAYBACK_DEBOUNCE_MS) {
+            if (now - lastPlaybackCallbackAt < PLAYBACK_DEBOUNCE_MS && !playbackStarted) {
                 Log.d("MediaController", "Ignoring playback callback due to debounce (${now - lastPlaybackCallbackAt}ms)")
-                lastPlaybackCallbackAt = now
+                lastKnownIsMusicActive = mediaActive
                 return
             }
             lastPlaybackCallbackAt = now
 
-            if (now - lastSelfActionAt < SELF_ACTION_IGNORE_MS) {
+            if (now - lastSelfActionAt < SELF_ACTION_IGNORE_MS &&
+                !(pausedForOtherDevice && playbackStarted && remoteAudioFocusRequest == null)) {
                 Log.d("MediaController", "Ignoring playback callback because it's likely caused by our own action (${now - lastSelfActionAt}ms since last self-action)")
-                lastKnownIsMusicActive = isActive
+                lastKnownIsMusicActive = mediaActive
                 return
             }
 
-            Log.d("MediaController", "Configs received: ${configs?.size ?: 0} configurations")
-            val currentActiveContentTypes = configs?.flatMap { config ->
-                Log.d("MediaController", "Processing config: ${config}, audioAttributes: ${config.audioAttributes}")
-                config.audioAttributes?.let { attrs ->
-                    val contentType = attrs.contentType
-                    Log.d("MediaController", "Config content type: $contentType")
-                    listOf(contentType)
-                } ?: run {
-                    Log.d("MediaController", "Config has no audioAttributes")
-                    emptyList()
-                }
-            }?.toSet() ?: emptySet()
-
-            Log.d("MediaController", "Current active content types: $currentActiveContentTypes")
-
-            val hasNewMusicOrMovie = currentActiveContentTypes.any { contentType ->
-                contentType == android.media.AudioAttributes.CONTENT_TYPE_MUSIC ||
-                contentType == android.media.AudioAttributes.CONTENT_TYPE_MOVIE
-            }
-
-            Log.d("MediaController", "Has new music or movie: $hasNewMusicOrMovie")
+            Log.d("MediaController", "Has media playback: $hasMediaPlayback")
 
             if (pausedForOtherDevice) {
-                if (isActive) {
+                if (isActive && playbackStarted) {
                     Log.d("MediaController", "Detected play while pausedForOtherDevice; attempting to take over")
-                    if (recentlyLostOwnership && hasNewMusicOrMovie) {
+                    if (recentlyLostOwnership && hasMediaPlayback) {
                         Log.d("MediaController", "Recently lost ownership; scheduling deferred take-over instead of dropping user play")
                         handler.removeCallbacks(deferredTakeOverRunnable)
                         deferredTakeoverGeneration = ServiceManager.getService()?.routingGeneration() ?: -1L
                         handler.postDelayed(deferredTakeOverRunnable, OWNERSHIP_RETRY_MS)
-                    } else if (hasNewMusicOrMovie) {
+                    } else if (hasMediaPlayback) {
                         if (!pausedWhileTakingOver) {
-                            ServiceManager.getService()?.takeOver("music")
+                            ServiceManager.getService()?.takeOver("music", localPlaybackIntent = true)
                         }
                     } else {
-                        Log.d("MediaController", "Skipping take-over due to recent ownership loss or no new music/movie")
+                        Log.d("MediaController", "Skipping take-over: no media playback")
                     }
                 } else {
                     Log.d("MediaController", "Still paused for the remote device; waiting for a local route request")
                 }
 
-                lastKnownIsMusicActive = isActive
+                lastKnownIsMusicActive = mediaActive
                 return
             }
 
@@ -195,11 +225,11 @@ object MediaController {
             }
 
             Log.d("MediaController", "pausedWhileTakingOver: $pausedWhileTakingOver")
-            if (!pausedWhileTakingOver && isActive && hasNewMusicOrMovie) {
+            if (!pausedWhileTakingOver && isActive && hasMediaPlayback) {
                 if (lastKnownIsMusicActive != true) {
                     if (!recentlyLostOwnership) {
                         Log.d("MediaController", "Music/movie is active and not pausedWhileTakingOver; requesting takeOver")
-                        ServiceManager.getService()?.takeOver("music")
+                        ServiceManager.getService()?.takeOver("music", localPlaybackIntent = true)
                     } else {
                         Log.d("MediaController", "Recently lost ownership; scheduling deferred take-over")
                         handler.removeCallbacks(deferredTakeOverRunnable)
@@ -209,7 +239,7 @@ object MediaController {
                 }
             }
 
-            lastKnownIsMusicActive = hasNewMusicOrMovie && isActive
+            lastKnownIsMusicActive = hasMediaPlayback && isActive
         }
     }
 
@@ -222,6 +252,10 @@ object MediaController {
         pausedForOtherDevice = true
         recentlyLostOwnership = true
         if (this::audioManager.isInitialized) sendPause(force = true)
+        // Some video apps have no active MediaSession and ignore media pause keys.
+        // The remote host is a full media owner: a permanent focus loss asks the
+        // actual player to pause instead of merely muting it for an interruption.
+        holdRemoteAudioFocus()
         val generation = ServiceManager.getService()?.routingGeneration()
         handler.postDelayed({
             if (ServiceManager.getService()?.routingGeneration() == generation) {
@@ -232,6 +266,7 @@ object MediaController {
 
     @Synchronized
     fun localRouteRequested() {
+        releaseRemoteAudioFocus()
         handler.removeCallbacks(deferredTakeOverRunnable)
         deferredTakeoverGeneration = -1L
         pausedForOtherDevice = false
@@ -251,12 +286,18 @@ object MediaController {
     }
 
     @Synchronized
-    fun resetRoutingState() {
-        localRouteRequested()
+    fun resetRoutingState(preserveRemotePause: Boolean = false) {
+        if (!preserveRemotePause) {
+            localRouteRequested()
+            iPausedTheMedia = false
+            lastKnownIsMusicActive = null
+        } else {
+            handler.removeCallbacks(deferredTakeOverRunnable)
+            deferredTakeoverGeneration = -1L
+            lastKnownIsMusicActive = getMusicActive()
+        }
         pausedWhileTakingOver = false
-        iPausedTheMedia = false
         userPlayedTheMedia = false
-        lastKnownIsMusicActive = null
     }
 
     @Synchronized

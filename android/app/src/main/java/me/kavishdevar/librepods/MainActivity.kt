@@ -54,6 +54,8 @@ import me.kavishdevar.librepods.data.AirPodsNotifications
 import me.kavishdevar.librepods.data.ControlCommandRepository
 import me.kavishdevar.librepods.presentation.navigation.NavigationRoot
 import me.kavishdevar.librepods.presentation.theme.LibrePodsTheme
+import me.kavishdevar.librepods.presentation.theme.DESIGN_SYSTEM_PREF
+import me.kavishdevar.librepods.presentation.theme.readDesignSystem
 import me.kavishdevar.librepods.presentation.viewmodel.AirPodsViewModel
 import me.kavishdevar.librepods.services.AirPodsService
 import me.kavishdevar.librepods.utils.XposedState
@@ -81,11 +83,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val sharedPreferences = LocalContext.current.getSharedPreferences("settings", MODE_PRIVATE)
-            val m3eEnabled = remember { mutableStateOf(sharedPreferences.getBoolean("m3e_enabled", true)) }
+            val designSystem = remember { mutableStateOf(readDesignSystem(sharedPreferences)) }
 
             val sharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
                 when (key) {
-                    "m3e_enabled" -> m3eEnabled.value = sharedPreferences.getBoolean(key, true)
+                    DESIGN_SYSTEM_PREF, "m3e_enabled" -> designSystem.value = readDesignSystem(sharedPreferences)
                 }
             }
 
@@ -96,7 +98,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
             LibrePodsTheme(
-                m3eEnabled = m3eEnabled.value
+                designSystem = designSystem.value
             ) {
 //                For demo screenshots
 //                val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)

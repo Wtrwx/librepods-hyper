@@ -105,8 +105,25 @@ fun StyledIconButton(
     enabled: Boolean = true,
     materialButtonStyle: MaterialButtonStyle = MaterialButtonStyle.Normal
 ) {
+    if (LocalDesignSystem.current == DesignSystem.Miuix) {
+        top.yukonga.miuix.kmp.basic.IconButton(
+            modifier = modifier.size(48.dp),
+            onClick = onClick,
+            enabled = enabled,
+            backgroundColor = surfaceColor
+        ) {
+            Text(
+                text = icon,
+                color = if (iconTint != Color.Unspecified) iconTint
+                    else top.yukonga.miuix.kmp.theme.MiuixTheme.colorScheme.onSurface,
+                style = TextStyle(fontSize = 20.sp, fontFamily = FontFamily(Font(R.font.sf_pro)))
+            )
+        }
+        return
+    }
+
     when (LocalDesignSystem.current) {
-        DesignSystem.Material -> {
+        DesignSystem.Material, DesignSystem.Miuix -> {
             when (materialButtonStyle) {
                 MaterialButtonStyle.Tonal -> {
                     FilledTonalIconButton(

@@ -91,7 +91,7 @@ fun NoiseControlSettings(
     onNoiseControlModeChanged: (Int) -> Unit
 ) {
     when (LocalDesignSystem.current) {
-        DesignSystem.Material -> {
+        DesignSystem.Material, DesignSystem.Miuix -> {
             val options = buildList {
                 if (showOffListeningMode) {
                     add(

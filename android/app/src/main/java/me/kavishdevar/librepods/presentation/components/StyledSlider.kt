@@ -233,8 +233,17 @@ fun StyledSlider(
     index: Int = 0,
     count: Int = 1
 ) {
+    if (LocalDesignSystem.current == DesignSystem.Miuix) {
+        val slider: @Composable () -> Unit = {
+            MiuixSettingsSlider(label, description, value, valueRange, onValueChange,
+                snapPoints, snapThreshold, startLabel, endLabel, startIcon, endIcon, enabled)
+        }
+        if (independent) MiuixSettingsList(content = slider) else slider()
+        return
+    }
+
     when (LocalDesignSystem.current) {
-        DesignSystem.Material -> {
+        DesignSystem.Material, DesignSystem.Miuix -> {
             val defaultShape = when {
                 count == 1 -> RoundedCornerShape(24.dp)
 

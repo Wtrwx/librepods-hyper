@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LibrePods"
+rootProject.name = "LibrePods Hyper"
 include(":app")

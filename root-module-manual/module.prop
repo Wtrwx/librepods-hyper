@@ -1,7 +1,6 @@
 id=librepods
-name=LibrePods
-version=v0.2.6
-versionCode=46
-author=@kavishdevar
-description=Installs LibrePods as a system app for granting BLUETOOTH_PRIVILEGED and MODIFY_PHONE_STATE permission for better integraion with android.
-updateJson=https://raw.githubusercontent.com/kavishdevar/librepods/main/extras/update_nonpatch.json
+name=LibrePods Hyper
+version=v1.0.0-rc2
+versionCode=63
+author=Wtrwx and LibrePods contributors
+description=Installs LibrePods Hyper as a privileged system app for Bluetooth battery, device icons and audio integration. Based on LibrePods.

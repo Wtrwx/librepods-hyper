@@ -98,7 +98,7 @@ fun ReleaseNotesScreen(
     val topPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val bottomPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
-    val m3eEnabled = LocalDesignSystem.current == DesignSystem.Material
+    val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple
 
     LibrePodsTheme(m3eEnabled = true) {
         Column(
@@ -117,7 +117,7 @@ fun ReleaseNotesScreen(
             )
 
             val versionName = BuildConfig.VERSION_NAME.removeSuffix("-debug").removeSuffix("-play")
-            val url = "https://github.com/kavishdevar/librepods/releases/v$versionName"
+            val url = "https://github.com/Wtrwx/librepods-hyper/releases"
             val fullText = "${stringResource(R.string.version)} $versionName"
             val textColor = MaterialTheme.colorScheme.primary
 

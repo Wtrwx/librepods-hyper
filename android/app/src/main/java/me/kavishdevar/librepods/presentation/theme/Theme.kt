@@ -28,8 +28,13 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.theme.defaultTextStyles
+import top.yukonga.miuix.kmp.theme.darkColorScheme as miuixDarkColorScheme
+import top.yukonga.miuix.kmp.theme.lightColorScheme as miuixLightColorScheme
 
 val ColorScheme.sectionHeader: Color
     get() = onBackground.copy(alpha = 0.6f)
@@ -61,11 +66,46 @@ private val AppleLightColorScheme = lightColorScheme(
 @Composable
 fun LibrePodsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    m3eEnabled: Boolean = false,
+    m3eEnabled: Boolean? = null,
+    designSystem: DesignSystem = when (m3eEnabled) {
+        true -> DesignSystem.Material
+        false -> DesignSystem.Apple
+        null -> DesignSystem.Miuix
+    },
     content: @Composable () -> Unit
 ) {
+    val miuixColors = if (darkTheme) miuixDarkColorScheme() else miuixLightColorScheme()
     val colorScheme = when {
-        m3eEnabled -> {
+        designSystem == DesignSystem.Miuix -> {
+            // Bridge legacy Material surfaces to the same palette as native MIUIx controls.
+            (if (darkTheme) darkColorScheme() else lightColorScheme()).copy(
+                primary = miuixColors.primary,
+                onPrimary = miuixColors.onPrimary,
+                primaryContainer = miuixColors.tertiaryContainer,
+                onPrimaryContainer = miuixColors.onTertiaryContainer,
+                secondary = miuixColors.primary,
+                onSecondary = miuixColors.onPrimary,
+                secondaryContainer = miuixColors.secondaryVariant,
+                onSecondaryContainer = miuixColors.onSecondaryVariant,
+                background = miuixColors.surface,
+                onBackground = miuixColors.onSurface,
+                surface = miuixColors.background,
+                onSurface = miuixColors.onBackground,
+                surfaceVariant = miuixColors.secondaryVariant,
+                onSurfaceVariant = miuixColors.onSurfaceVariantSummary,
+                surfaceContainer = miuixColors.surface,
+                surfaceContainerLow = miuixColors.background,
+                surfaceContainerHigh = miuixColors.surfaceContainerHigh,
+                surfaceContainerHighest = miuixColors.surfaceContainerHighest,
+                outline = miuixColors.outline,
+                outlineVariant = miuixColors.dividerLine,
+                error = miuixColors.error,
+                onError = miuixColors.onError,
+                errorContainer = miuixColors.errorContainer,
+                onErrorContainer = miuixColors.onErrorContainer
+            )
+        }
+        designSystem == DesignSystem.Material -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
@@ -73,16 +113,32 @@ fun LibrePodsTheme(
         else -> AppleLightColorScheme
     }
 
-    CompositionLocalProvider(
-        LocalDesignSystem provides
-            if (m3eEnabled) DesignSystem.Material
-            else DesignSystem.Apple
-    ) {
+    val miuixTextStyles = remember { defaultTextStyles() }
+    val typography = when (designSystem) {
+        DesignSystem.Apple -> AppleTypography
+        DesignSystem.Material -> MaterialTypography
+        DesignSystem.Miuix -> MaterialTypography.copy(
+            bodyLarge = miuixTextStyles.main,
+            bodyMedium = miuixTextStyles.body1,
+            bodySmall = miuixTextStyles.body2,
+            titleLarge = miuixTextStyles.title1,
+            titleMedium = miuixTextStyles.title3,
+            titleSmall = miuixTextStyles.title4,
+            labelLarge = miuixTextStyles.button,
+            labelMedium = miuixTextStyles.body1,
+            labelSmall = miuixTextStyles.footnote1
+        )
+    }
+    CompositionLocalProvider(LocalDesignSystem provides designSystem) {
         MaterialExpressiveTheme(
             colorScheme = colorScheme,
             motionScheme = MotionScheme.expressive(),
-            typography = if (m3eEnabled) MaterialTypography else AppleTypography,
-            content = content
-        )
+            typography = typography
+        ) {
+            // Keep MIUIx's interaction feedback inside the legacy Material bridge.
+            if (designSystem == DesignSystem.Miuix) {
+                MiuixTheme(colors = miuixColors, textStyles = miuixTextStyles, content = content)
+            } else content()
+        }
     }
 }

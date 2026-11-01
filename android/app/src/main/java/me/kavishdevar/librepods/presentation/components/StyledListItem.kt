@@ -84,7 +84,7 @@ fun StyledListItem(
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null
 ) {
-    val m3eEnabled = LocalDesignSystem.current == DesignSystem.Material
+    val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple
     Column {
         title?.let {
             Box(
@@ -176,6 +176,12 @@ private fun StyledListItemContent(
     leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null
 ) {
+    if (LocalDesignSystem.current == DesignSystem.Miuix) {
+        MiuixSettingsRow(modifier, name, description, enabled, onClick, selected,
+            orientation, leadingContent, trailingContent)
+        return
+    }
+
     val isDarkTheme = isSystemInDarkTheme()
     val surfaceColor = MaterialTheme.colorScheme.surface
     val surfaceDimColor = MaterialTheme.colorScheme.surfaceDim
@@ -323,7 +329,7 @@ private fun StyledListItemContent(
             }
         }
 
-        DesignSystem.Material -> {
+        DesignSystem.Material, DesignSystem.Miuix -> {
             val defaultShape = when {
                 count == 1 -> RoundedCornerShape(24.dp)
 

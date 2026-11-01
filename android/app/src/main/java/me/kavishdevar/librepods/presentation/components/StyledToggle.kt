@@ -78,7 +78,14 @@ fun StyledToggle(
     onCheckedChange: (Boolean) -> Unit,
     header: Boolean = false
 ) {
-    val m3eEnabled = LocalDesignSystem.current == DesignSystem.Material
+    if (LocalDesignSystem.current == DesignSystem.Miuix) {
+        MiuixSettingsList(modifier = Modifier.padding(vertical = 12.dp), title = title) {
+            MiuixToggleRow(label, description, checked, enabled, onCheckedChange)
+        }
+        return
+    }
+
+    val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple
     Column(modifier = Modifier.padding(vertical = 12.dp)) {
         title?.let {
             Box(
@@ -171,6 +178,11 @@ private fun StyledToggleContent(
     count: Int,
     header: Boolean = false
 ) {
+    if (LocalDesignSystem.current == DesignSystem.Miuix) {
+        MiuixToggleRow(label, description, checked, enabled, onCheckedChange)
+        return
+    }
+
     val currentChecked by rememberUpdatedState(checked)
 
     val isDarkTheme = isSystemInDarkTheme()
@@ -179,7 +191,7 @@ private fun StyledToggleContent(
     val haptics = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
 
-    val m3eEnabled = LocalDesignSystem.current == DesignSystem.Material
+    val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple
 
     if (m3eEnabled) {
         val defaultShape = when {

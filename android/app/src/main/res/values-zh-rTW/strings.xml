@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name" translatable="false">LibrePods</string>
+    <string name="app_name" translatable="false">LibrePods Hyper</string>
+    <string name="apple_appearance">Apple 風格</string>
     <string name="app_description">讓你的 AirPods 擺脫 Apple 生態系統的束縛。</string>
     <string name="app_widget_description">直接從主畫面查看 AirPods 電池狀態！</string>
     <string name="accessibility">輔助使用</string>
@@ -157,7 +158,7 @@
     <string name="use_alternate_head_tracking_packets_description">如果頭部追蹤對你無效，請啟用此選項。這會傳送不同的資料給 AirPods 以請求/停止頭部追蹤資料。</string>
     <string name="act_as_an_apple_device">作為 Apple 裝置</string>
     <string name="act_as_an_apple_device_description">啟用多裝置連線及輔助使用功能，例如自訂通透模式（增強、音色、環境噪音抑制、對話增強及 EQ）。</string>
-    <string name="act_as_an_apple_device_warning">可能不穩定！！你的 AirPods 最多只能同時連接兩個裝置。如果你正與 iPad 或 Mac 等 Apple 裝置搭配使用，請先連接該裝置，然後再連接你的 Android。</string>
+    <string name="act_as_an_apple_device_warning">多裝置連線最多支援兩台主機，相容性取決於耳機韌體與手機藍牙堆疊。變更身分設定後，請重新載入藍牙並連接耳機。</string>
     <string name="reset_hook_offset">重設 Hook 偏移量</string>
     <string name="reset_hook_offset_description">這將清除目前的 Hook 偏移量，並需要你再次進行設定程序。確定要繼續嗎？</string>
     <string name="reset">重設</string>
@@ -225,7 +226,7 @@
     <string name="automatic_connection_description">啟用並自訂自動連接至 AirPods 的功能。</string>
     <string name="customizations_description">存取應用程式自訂功能，包括小工具中的手機電量、對話感知音量，以及更多即將推出的自訂功能。</string>
     <string name="support_the_development">支援開發</string>
-    <string name="support_development_description">LibrePods 由單一開發者開發。升級有助於維持應用程式的運作。</string>
+    <string name="support_development_description">LibrePods Hyper 是社群維護的 LibrePods 衍生專案，由開源貢獻者共同完善。</string>
     <string name="feature_availability_disclaimer">功能的可用性取決於你的 AirPods 型號與韌體版本。</string>
     <string name="contact">聯絡</string>
     <string name="email">電子郵件</string>

@@ -43,6 +43,17 @@ internal class SmartRoutingState(private val now: () -> Long = { System.nanoTime
         owner = Owner.LOCAL
     }
 
+    /** Missing ownership telemetry must not undo a confirmed local audio source. */
+    @Synchronized fun needsTakeover(ownsConnection: Boolean, audioSourceIsOtherDevice: Boolean): Boolean =
+        owner == Owner.REMOTE || audioSourceIsOtherDevice || (!ownsConnection && owner != Owner.LOCAL)
+
+    /** Actual A2DP playback can confirm our claim, but cannot reclaim a remote route. */
+    @Synchronized fun confirmLocalPlayback(token: Long): Boolean {
+        if (token != generation || (owner != Owner.LOCAL_PENDING && owner != Owner.LOCAL)) return false
+        owner = Owner.LOCAL
+        return true
+    }
+
     @Synchronized fun hasResumeRequest(): Boolean = resumeMedia && now() < claimDeadline
 
     @Synchronized fun consumeResume(token: Long, profileActive: Boolean): Boolean {

@@ -1,261 +1,94 @@
-> [!WARNING]
-> librepods.org is not an official website of the LibrePods project. It inaccurately claims to be the official website of the project by claiming copyrights and using the LibrePods logo in the footer. And at the same time, they say that the project is not affiliated with the LibrePods project or its developers.
-> 
-> Please report any other such websites to [me@kavish.xyz](mailto:me@kavish.xyz)
- 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./imgs/banner-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="./imgs/banner.png" />
-  <img alt="LibrePods" src="./imgs/banner.png" />
-</picture>
+<p align="center">
+  <img src="./imgs/banner-hyper.svg" alt="LibrePods Hyper — AirPods、Android 与 iPhone 之间的连接" width="100%" />
+</p>
 
-<div align="center" style="margin: 20px 0px;">
-<a href="https://github.com/kavishdevar/librepods/releases/latest">
-  <img src="https://img.shields.io/github/downloads/kavishdevar/librepods/total?label=GitHub%20Downloads" />
-</a>
-<a href="https://github.com/kavishdevar/librepods/actions/workflows/ci-android.yml">
-  <img src="https://github.com/kavishdevar/librepods/actions/workflows/ci-android.yml/badge.svg" />
-</a>
-<a href="https://github.com/kavishdevar/librepods/actions/workflows/ci-linux-rust.yml">
-  <img src="https://github.com/kavishdevar/librepods/actions/workflows/ci-linux-rust.yml/badge.svg" />
-</a>
-<a href="https://github.com/kavishdevar/librepods/issues">
-  <img src="https://img.shields.io/github/issues/kavishdevar/librepods" />  
-</a>
-<a href="https://discord.gg/HhG4ycVum4">
-  <img src="https://img.shields.io/discord/1441416992027574375?logoColor=white&color=5865F2&label=Discord" />
-</a>
-</div>
+<p align="center"><strong>一副 AirPods，连接更多日常。</strong><br />面向 Android 的 AirPods 增强客户端，专注智能切换、HyperOS 系统集成与 MIUIx 界面。</p>
 
-# What is LibrePods?
+<p align="center">
+  <a href="https://github.com/Wtrwx/librepods-hyper/actions/workflows/ci-android.yml"><img src="https://github.com/Wtrwx/librepods-hyper/actions/workflows/ci-android.yml/badge.svg" alt="Android CI" /></a>
+  <a href="https://github.com/Wtrwx/librepods-hyper/releases"><img src="https://img.shields.io/badge/Android-13%2B-35b778?logo=android&logoColor=white" alt="Android 13+" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0--or--later-6f87e8" alt="GPL-3.0-or-later" /></a>
+  <a href="https://github.com/compose-miuix-ui/miuix"><img src="https://img.shields.io/badge/UI-MIUIx-ff864d" alt="MIUIx UI" /></a>
+</p>
 
-LibrePods allows you to use AirPods features that are exclusive to Apple devices. It implements the proprietary protocol used to exchange data between AirPods and Apple devices, enabling features like changing noise control modes, fast ear detection, accurate battery status, head gestures, conversational awareness, and more on non-Apple platforms.
+<p align="center">简体中文 · <a href="./README.en.md">English</a> · <a href="./android/README.md">安装与设置</a> · <a href="https://github.com/Wtrwx/librepods-hyper/issues">反馈问题</a></p>
 
-# Feature availability
+## 关于 Hyper
 
-| Feature                                                     | Linux | Android |
-| ----------------------------------------------------------- | ----- | ------- |
-| Changing Listening Mode                                     | ✅     | ✅       |
-| Ear detection                                               | ✅     | ✅       |
-| Battery status                                              | ✅     | ✅       |
-| Renaming AirPods <details><summary>Note for Android</summary>On Android, you need to re-pair your AirPods after renaming them because Android might not use the latest name.</details>                                            | ✅     | ✅       |
-| Loud Sound Reduction                                        | 🔴     | ⚪       |
-| Head Gestures                                               | ⛔     | ✅       |
-| Conversational Awareness                                    | ✅     | ✅       |
-| Automatically connect to AirPods                            | ✅     | ✅       |
-| Hearing Aid                                                 | 🔴     | ⚪       |
-| Transparency Mode customization                             | 🔴     | ⚪       |
-| Multi-device connectivity (Bluetooth Multipoint; 2 devices only) | ⚪     | ⚪       |
-| <details><summary>Other accessibility configs (click to expand)</summary><ul><li>Press speed</li><li>Press and Hold duration</li><li>Noise Cancellation with single AirPod</li><li>Volume control on swipe</li><li>Volume swipe speed</li></ul></details>       | 🔴     | ✅       |
-| <details><summary>Other general configs</summary><ul><li>Press and Hold to cycle between listening modes/invoke digital assistant (invoking digital assistant needs a recent firmware)</li><li>Configure call controls</li><li>Personalized volume</li><li>Loud Sound Reduction (needs <a href="#vendorid-spoofing">VendorID spoofing</a>)</li><li>Microphone side</li><li>Pause media when falling asleep (needs a recent firmware)</li><li>Enable <code>Off listening mode</code> to switch to <code>Off</code></li></ul></details>                   | 🔴     | ✅       |
-| [Head-tracked Spatial Audio](#spatial-audio)                | ❓     | ❓       |
-| [Heart Rate Monitoring](#heart-rate-monitoring)             | ⛔     | 🔴       |
-| [Find My](#find-my)                                         | ❓     | ❓       |
-| [High quality two-way audio](#high-quality-two-way-audio)   | 🔴     | 🔴       |
+**LibrePods Hyper** 是由 [Wtrwx](https://github.com/Wtrwx) 独立维护的 [LibrePods](https://github.com/librepods-org/librepods) 衍生项目。它延续上游的 AirPods 协议支持，重点完善 Android 与 Apple 设备之间的音频协同，以及小米 HyperOS 的电量、设备信息和连接体验。
 
-| Symbol | Meaning                                                             |
-| ------ | ------------------------------------------------------------------- |
-| ✅     | Implemented and works well                                          |
-| ⚪     | Needs [VendorID spoofing](#vendorid-spoofing); use at your own risk |
-| 🔴     | Not implemented yet; planned                                        |
-| ⛔     | Will not be implemented                                             |
-| ❓     | Unknown                                                             |
+本分支与上游官方发行版分别维护。下载、构建和问题反馈请使用本仓库入口。
 
-## Find My
+## 当前功能
 
-The following features related to Find My are planned, but require further RE and might need root on Android:
+| 能力 | 当前实现 |
+| --- | --- |
+| 多设备音频切换 | 通过 AACP / TiPi 协调 Android 与另一台设备的音频所有权；支持播放触发切换与远端接管时暂停本机媒体 |
+| 连接顺序处理 | 初始化连接优先级名单，并在对端连接就绪后发送中继消息，修复先连 Android、后连 iPhone 的相关路径 |
+| HyperOS 系统集成 | 小米蓝牙扩展兼容、左右耳与充电盒精确电量、系统设备元数据保留 |
+| 日常控制 | 降噪、通透、自适应模式、入耳检测、电量通知、快捷设置与桌面小组件 |
+| 连接提示 | 可配置底部弹窗与灵动岛样式提示 |
+| MIUIx 外观 | MIUIx 主题与主要界面控件，提供浅色 / 深色适配；可切换 Apple 或 Material 3 外观 |
+| 辅助与设备设置 | 延续上游的头部手势、对话感知、个性化设置及部分辅助听力功能，具体取决于机型与固件 |
 
-- Add your AirPods to the Find My network
-- Play sound through charging case to find it
-- Notify when leaving behind
-- Toggle case charging sounds
+多设备连接最多支持两台主机，实际可用性取决于 AirPods 固件、Android 蓝牙栈与 Hook 环境。通话优先级保护已经接入路由逻辑，仍需按具体通话应用验证。
 
-## Spatial Audio
+### 验证范围
 
-The app does not currently provide head tracking information to Android for the OS to perform HRTF. This has not been explored completely, and it might need root. 
+当前主要测试组合为 **小米 17 / HyperOS（Android 16）+ iPhone XR / iOS 16.0 + AirPods Pro 3**。Mac 相关适配来自此前的开发工作；不同耳机、手机系统与固件需要分别验证。
 
-Spatializing stereo sound is beyond this project's scope and will never be available. Many OEMs have an implementation of their own for this.
+本仓库也保留了上游 [Linux 实现](./linux/README.md)。Hyper 新增的 MIUIx 界面与小米适配面向 Android。
 
-## Heart Rate Monitoring (AirPods Pro 3 and later)
-This is being worked upon, check the #⁠reverse-engineering channel on the LibrePods Discord server for more information. If it is ever implemented, it will most likely need root on Android.
+## 安装
 
-## High quality two-way audio
-On iOS/iPadOS, you can continue using A2DP while AirPods send the audio stream from its microphone over AACP. 
+1. 从本仓库的 [Releases](https://github.com/Wtrwx/librepods-hyper/releases) 或 [Android CI](https://github.com/Wtrwx/librepods-hyper/actions/workflows/ci-android.yml) 下载构建产物。CI 提供 FOSS 调试 APK 和可选的 root 模块。
+2. 安装 APK，授予蓝牙、通知及需要使用的其他权限。
+3. 若系统无法原生建立 AirPods 控制通道，或需要多设备身份与小米集成，安装 root / Xposed 环境，并在 LSPosed / Vector 中启用模块与对应作用域。
+4. 多设备使用时，在 App 设置中开启「模拟 Apple 设备」和「允许 Smart Routing 自动切换」，并启用耳机的「自动连接」。按提示重启蓝牙进程后重新连接。
 
-Since this needs deeper integration with audio on Android, it will most likely need root.
+完整作用域、可选系统模块与故障排查见 [Android 安装指南](./android/README.md)。仅安装 APK 不会自动赋予系统权限或启用 Xposed。
 
-# Installation
+## 多设备切换
 
-- [**Android**](/android/README.md)
-- [**Linux**](/linux/README.md)
+两台主机分别与 AirPods 配对。播放时，LibrePods Hyper 使用耳机的蓝牙控制通道协调音频路由，远端取得所有权后暂停 Android 媒体；Android 上新的播放动作可再次申请路由。
 
-# VendorID Spoofing
+这套协同不要求 Android 与 iPhone 通过 Wi-Fi、IP 或 Tailscale 互通，也无需在 iPhone 上安装配套 App。
 
-Turns out, if you change the VendorID in DID Profile to that of Apple, you get access to several special features!
+首次设置后，可按以下顺序确认自己的设备组合：
 
-You can do this on Linux by editing the DeviceID in `/etc/bluetooth/main.conf`. Add this line to the config file `DeviceID = bluetooth:004C:0000:0000`. For android you can enable the `act as Apple device` setting in the app's settings (shown only when Xposed is available and LibrePods module is enabled).
+1. 两端暂停，先连接 Android，再连接 iPhone，确认 Android 仍保持连接。
+2. 在 Android 播放，再在 iPhone 播放，确认音频切换及 Android 暂停。
+3. 返回 Android 重新播放，确认能自动接回；再测试反向连接顺序。
 
-## Multi-device Connectivity
+## 构建
 
-Upto two devices can be simultaneously connected to AirPods, for audio and control both. Seamless connection switching. The same notification shows up on Apple device when Android takes over the AirPods as if it were an Apple device ("Move to iPhone"). Android also shows a popup when the other device takes over.
+工程使用 **JDK 21、Android SDK 37、NDK 30.0.14904198、CMake 3.22.1**。在 Android Studio 中打开 `android/`，或运行：
 
-## Accessibility Settings and Hearing Aid
+```sh
+cd android
+./gradlew :app:testFossDebugUnitTest :app:assembleFossDebug
+```
 
-Accessibility settings like customizing transparency mode (amplification, balance, tone, conversation boost, and ambient noise reduction), and loud sound reduction can be configured.
+APK 输出到 `android/app/build/outputs/apk/foss/debug/app-foss-debug.apk`。构建可选系统模块：
 
-All hearing aid customizations can be done from Android (linux soon), including setting the audiogram result. The app doesn't provide a way to take a hearing test because it requires much more precision. It is much better to use an already available audiogram result. 
+```sh
+./gradlew :app:zipDebugModule
+```
 
-# Protocol and Reverse Engineering
+模块输出到 `android/app/build/outputs/rootModuleZips/`。发行签名通过未提交的 `android/local.properties` 配置；同一签名的构建才能直接覆盖升级。
 
-Please refer to the Wireshark dissector plugin by Nojus ([@pabloaul](https://github.com/pabloaul)) for more information on the protocols used: [pabloaul/apple-wireshark](https://github.com/pabloaul/apple-wireshark)
+## 协议与贡献
 
-The dissector had not been used in LibrePods for most of the implementation; I had reverse engineered the protocol myself before this dissector was made. But many (future) features including two-way high quality audio and spatial audio would not have been possible without their RE efforts!
+- [AACP 操作码](./docs/opcodes.md)、[控制命令](./docs/control_commands.md)、[设备信息](./docs/device-info.md)
+- [MIUIx](https://github.com/compose-miuix-ui/miuix)：Compose 界面组件库
+- [apple-wireshark](https://github.com/pabloaul/apple-wireshark)：Apple 蓝牙协议解析工具
 
-# Use of AI
+反馈连接问题时，请附上耳机型号与固件、手机型号与系统、root / Xposed 环境、连接顺序及复现步骤。日志中的配对密钥、个人设备地址等信息应先脱敏。
 
-## Android app
+## 来源与许可
 
-These parts of the app were completely AI-generated: 
-- Head Gestures - all of it, including logic and the UI
-- The offset setup with r2+the xposed module (both versions)
-- Troubleshooter and LogCollector
+感谢 LibrePods 上游维护者 [kavishdevar](https://github.com/kavishdevar)、[librepods-org](https://github.com/librepods-org) 及所有贡献者，以及 [tyalie](https://github.com/tyalie)、[pabloaul](https://github.com/pabloaul)、[rithvikvibhu](https://github.com/rithvikvibhu)、[devnoname120](https://github.com/devnoname120)、[timgromeyer](https://github.com/timgromeyer) 的协议研究与实现工作。部分界面实现来自 [Kyant0](https://github.com/Kyant0) 的开源项目；依赖许可见应用内的开源许可页面。Hyper 的开发、逆向和测试也使用了 AI 辅助。
 
-Rest everything- the background service, the Bluetooth manager classes (AACP and ATT), the entire UI, even the smallest components were written manually.
+Copyright (C) 2025 LibrePods contributors. Hyper 的新增修改由相应贡献者维护。本项目继续采用 **GPL-3.0-or-later**，完整条款见 [LICENSE](./LICENSE)，保留源文件中的版权与许可声明。
 
-Some parts of the UI components were borrowed from [Kyant0's demo app](https://github.com/Kyant0/AndroidLiquidGlass/tree/master/catalog), which is licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
-
-## Linux (rewrite)
-
-The `aacp.rs` and the `att.rs` files were translated from Kotlin to Rust with AI. Some parts of the `media_controller.rs` file, mainly the pulse integration, was also AI-generated.
-
-# Supporters
-
-A huge thank you to everyone supporting the project!
-
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/davdroman">
-        <img src="https://github.com/davdroman.png?size=48" width="48" height="48"alt="davdroman"/><br />
-        @davdroman
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/tedsalmon">
-        <img src="https://github.com/tedsalmon.png?size=48" width="48" height="48"alt="tedsalmon"/><br />
-        @tedsalmon
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/wiless">
-        <img src="https://github.com/wiless.png?size=48" width="48" height="48"alt="wiless"/><br />
-        @wiless
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/SmartMsg">
-        <img src="https://github.com/SmartMsg.png?size=48" width="48" height="48"alt="SmartMsg"/><br />
-        @SmartMsg
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/lunaroyster">
-        <img src="https://github.com/lunaroyster.png?size=48" width="48" height="48"alt="lunaroyster"/><br />
-        @lunaroyster
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/ressiwage">
-        <img src="https://github.com/ressiwage.png?size=48" width="48" height="48"alt="ressiwage"/><br />
-        @ressiwage
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/kkjdroid">
-        <img src="https://github.com/kkjdroid.png?size=48" width="48" height="48"alt="kkjdroid"/><br />
-        @kkjdroid
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/CitrusJoules">
-        <img src="https://github.com/CitrusJoules.png?size=48" width="48" height="48"alt="CitrusJoules"/><br />
-        @CitrusJoules
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/DanielReyesDev">
-        <img src="https://github.com/DanielReyesDev.png?size=48" width="48" height="48"alt="DanielReyesDev"/><br />
-        @DanielReyesDev
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/sumitduster">
-        <img src="https://github.com/sumitduster.png?size=48" width="48" height="48"alt="sumitduster"/><br />
-        @sumitduster
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/GrifTheDev">
-        <img src="https://github.com/GrifTheDev.png?size=48" width="48" height="48"alt="GrifTheDev"/><br />
-        @GrifTheDev
-      </a>
-    </td>
-  </tr>
-</table>
-
-# Special Thanks
-- @tyalie for making the first documentation on the protocol! ([tyalie/AAP-Protocol-Definition](https://github.com/tyalie/AAP-Protocol-Defintion))
-- @rithvikvibhu and folks over at lagrangepoint for helping with the hearing aid feature ([gist](https://gist.github.com/rithvikvibhu/45e24bbe5ade30125f152383daf07016))
-- @devnoname120 for helping with the first root patch
-- @timgromeyer for making the first version of the linux app
-- @hackclub for hosting [High Seas](https://highseas.hackclub.com) and [Low Skies](https://low-skies.hackclub.com)!
-- Of course, everyone who has contributed to the project in any way, including by testing, sharing feedback, or just showing interest!
-
-# Alternates for other platforms:
-- CAPod - A companion app for AirPods on Android. ([play store](https://play.google.com/store/apps/details?id=eu.darken.capod) | [source code](https://github.com/d4rken-org/capod)). Use this if you're using Android version 16 QPR3 or below and are not rooted.
-- MagicPods for Steam Deck ([website](https://magicpods.app/steamdeck/))
-- MagicPods - if you're looking for "LibrePods for Windows"  ([ms store](https://apps.microsoft.com/store/detail/9P6SKKFKSHKM) [installer](https://magicpods.app/installer/MagicPods.appinstaller) | [website](https://magicpods.app/))
-
-# Star History
-
-<a href="https://www.star-history.com/?repos=librepods-org%2Flibrepods&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=librepods-org/librepods&type=date&theme=dark&legend=top-left&sealed_token=CS9QF2Wcx-_EN6M7lBhwvTa2WBd5eB8FbQa5FWt3SV14v1OcQdy2aCGsXxHoytVaoylP_pTxj1h2U-odoXDV_EwTqMxM-MQwG_WpvV_1g_yH-Jh3ux2BuWCmS98LxLqfox2ibLOlFDHu_-geTLFsTmqTc1SjX6-NYxVHXF5DaqnxFOAyjLPL5_WtXVew" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=librepods-org/librepods&type=date&legend=top-left&sealed_token=CS9QF2Wcx-_EN6M7lBhwvTa2WBd5eB8FbQa5FWt3SV14v1OcQdy2aCGsXxHoytVaoylP_pTxj1h2U-odoXDV_EwTqMxM-MQwG_WpvV_1g_yH-Jh3ux2BuWCmS98LxLqfox2ibLOlFDHu_-geTLFsTmqTc1SjX6-NYxVHXF5DaqnxFOAyjLPL5_WtXVew" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=librepods-org/librepods&type=date&legend=top-left&sealed_token=CS9QF2Wcx-_EN6M7lBhwvTa2WBd5eB8FbQa5FWt3SV14v1OcQdy2aCGsXxHoytVaoylP_pTxj1h2U-odoXDV_EwTqMxM-MQwG_WpvV_1g_yH-Jh3ux2BuWCmS98LxLqfox2ibLOlFDHu_-geTLFsTmqTc1SjX6-NYxVHXF5DaqnxFOAyjLPL5_WtXVew" />
- </picture>
-</a>
-
-# License
-
-LibrePods - AirPods liberated from Apple’s ecosystem
-Copyright (C) 2025 LibrePods contributors
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-# Trademark Notice
-
-The GPL does not grant any rights to use the LibrePods name, logo, or branding. The LibrePods name and logo may not be used for software, websites, domains, products, services, or other projects in a manner that suggests affiliation with, endorsement by, or association with the official LibrePods project without prior permission.
-
-If you see any misuse of the LibrePods name or logo, please report it to [me@kavish.xyz](mailto:me@kavish.xyz).
-
-The SF Pro font used in the Android app is the property of Apple Inc.. This will be removed in future versions of the app and replaced with an open alternative soon.
-
-AirPods, AirPods Pro, AirPods Max, and the AirPods logo are trademarks of Apple Inc. The LibrePods project is not affiliated with or endorsed by Apple Inc. in any way.
+LibrePods 名称、Logo 与品牌权利属于上游项目；LibrePods Hyper 由社区独立维护，不代表上游官方。AirPods、AirPods Pro、AirPods Max 为 Apple Inc. 的商标；本项目不隶属于 Apple 或 Xiaomi，也未获得其背书。

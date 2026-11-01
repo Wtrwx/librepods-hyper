@@ -93,11 +93,17 @@ fun StyledScaffold(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     content: @Composable () -> Unit
 ) {
+    if (LocalDesignSystem.current == DesignSystem.Miuix) {
+        MiuixScreenScaffold(modifier, visible, title, showBackButton, onNavigateBack,
+            actionButtons, snackbarHostState, content)
+        return
+    }
+
     val isDarkTheme = isSystemInDarkTheme()
     val hazeState = rememberHazeState(blurEnabled = true)
 
     when (LocalDesignSystem.current) {
-        DesignSystem.Material -> {
+        DesignSystem.Material, DesignSystem.Miuix -> {
             Scaffold(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 snackbarHost = { SnackbarHost(snackbarHostState) },

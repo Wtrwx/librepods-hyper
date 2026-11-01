@@ -63,7 +63,7 @@ fun AppNavGraph(
         navigate(Screen.Purchase)
     }
 
-    val m3eEnabled = LocalDesignSystem.current == DesignSystem.Material
+    val m3eEnabled = LocalDesignSystem.current != DesignSystem.Apple
 
     SharedTransitionLayout {
         NavDisplay(
