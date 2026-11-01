@@ -34,6 +34,9 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v4
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - name: Install Android build tools
         run: sdkmanager "platforms;android-37" "ndk;30.0.14904198" "cmake;3.22.1"
       - name: Configure signing when available
