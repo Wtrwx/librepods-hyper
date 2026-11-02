@@ -176,54 +176,13 @@ aboutLibraries {
     }
 }
 
-val rootModuleDir = rootProject.file("../root-module-manual")
 val releaseDir = rootProject.file("../release")
-
-fun cap(s: String) = s.replaceFirstChar { it.uppercase() }
-
-fun registerRootModuleZipTask(
-    name: String,
-    flavor: String,
-    buildType: String
-) = tasks.register<Zip>(name) {
-
-    val variantTask = "assemble${cap(flavor)}${cap(buildType)}"
-    dependsOn(variantTask)
-
-    val apkPath = "outputs/apk/$flavor/$buildType/app-$flavor-$buildType.apk"
-
-    from(rootModuleDir)
-
-    duplicatesStrategy = DuplicatesStrategy.WARN
-
-    from(layout.buildDirectory.file(apkPath)) {
-        into("system/priv-app/LibrePods")
-        rename { "LibrePods.apk" }
-    }
-
-    delete(layout.buildDirectory.dir("outputs/rootModuleZips"))
-
-    archiveFileName.set("LibrePods-Hyper-FOSS-v$appVersionName-$buildType.zip")
-    destinationDirectory.set(layout.buildDirectory.dir("outputs/rootModuleZips"))
-}
-
-val zipRelease = registerRootModuleZipTask(
-    "zipReleaseModule",
-    "foss",
-    "release"
-)
-
-val zipDebug = registerRootModuleZipTask(
-    "zipDebugModule",
-    "foss",
-    "debug"
-)
 
 val collect = tasks.register<Copy>("collectReleaseArtifacts") {
 
     dependsOn(
-        zipRelease,
-        zipDebug,
+        "assembleFossRelease",
+        "assembleFossDebug",
         "bundlePlayRelease"
     )
 
@@ -241,10 +200,6 @@ val collect = tasks.register<Copy>("collectReleaseArtifacts") {
 
     from(layout.buildDirectory.dir("outputs/bundle/playRelease")) {
         include("*.aab")
-    }
-
-    from(layout.buildDirectory.dir("outputs/rootModuleZips")) {
-        include("*.zip")
     }
 }
 

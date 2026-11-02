@@ -5,12 +5,10 @@ on:
     branches: [main]
     paths:
       - 'android/**'
-      - 'root-module-manual/**'
       - '.github/workflows/ci-android.yml'
   pull_request:
     paths:
       - 'android/**'
-      - 'root-module-manual/**'
       - '.github/workflows/ci-android.yml'
   workflow_dispatch:
 
@@ -61,18 +59,13 @@ jobs:
           else:
               print('Using the CI debug signing key; no release signing is configured')
           PYTHON
-      - name: Run unit tests and build FOSS APK and root module
+      - name: Run unit tests and build FOSS APK
         working-directory: android
-        run: ./gradlew :app:testFossDebugUnitTest :app:assembleFossDebug :app:zipDebugModule --no-daemon
+        run: ./gradlew :app:testFossDebugUnitTest :app:assembleFossDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: LibrePods-Hyper-FOSS-debug
           path: android/app/build/outputs/apk/foss/debug/app-foss-debug.apk
-          if-no-files-found: error
-      - uses: actions/upload-artifact@v4
-        with:
-          name: LibrePods-Hyper-root-module-debug
-          path: android/app/build/outputs/rootModuleZips/*debug.zip
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: always()

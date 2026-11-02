@@ -30,7 +30,7 @@ The main test combination is **Xiaomi 17 / HyperOS (Android 16), iPhone XR / iOS
 3. Enable the module in a compatible Xposed framework when your Bluetooth stack needs the workaround, or when using the vendor identity and Xiaomi integrations.
 4. For smart routing, enable **Act as an Apple device**, **Allow automatic Smart Routing takeover**, and the AirPods **Automatic Connection** setting. Reload Bluetooth when prompted and reconnect.
 
-See the [Android guide](./android/README.md) for module scope, optional privileged installation and troubleshooting. Installing the APK alone does not enable Xposed or grant privileged permissions.
+See the [Android guide](./android/README.md) for Xposed module scope and troubleshooting. Installing the APK alone does not enable Xposed or grant privileged permissions.
 
 Pair both hosts with AirPods. Routing coordination uses the earbud's Bluetooth control channel; Android and iPhone do not need IP connectivity, Tailscale or an iPhone companion app.
 
@@ -43,11 +43,9 @@ Use JDK 21, Android SDK 37, NDK 30.0.14904198 and CMake 3.22.1:
 ```sh
 cd android
 ./gradlew :app:testFossDebugUnitTest :app:assembleFossDebug
-# Optional privileged root module:
-./gradlew :app:zipDebugModule
 ```
 
-The APK is generated at `android/app/build/outputs/apk/foss/debug/app-foss-debug.apk`; module ZIPs are in `android/app/build/outputs/rootModuleZips/`. Configure release signing in an untracked `android/local.properties`. In-place updates require a matching signing key.
+The APK is generated at `android/app/build/outputs/apk/foss/debug/app-foss-debug.apk`. Configure release signing in an untracked `android/local.properties`. In-place updates require a matching signing key.
 
 ## Credits and license
 

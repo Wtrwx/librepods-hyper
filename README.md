@@ -41,12 +41,12 @@
 
 ## 安装
 
-1. 从本仓库的 [Releases](https://github.com/Wtrwx/librepods-hyper/releases) 或 [Android CI](https://github.com/Wtrwx/librepods-hyper/actions/workflows/ci-android.yml) 下载构建产物。CI 提供 FOSS 调试 APK 和可选的 root 模块。
+1. 从本仓库的 [Releases](https://github.com/Wtrwx/librepods-hyper/releases) 或 [Android CI](https://github.com/Wtrwx/librepods-hyper/actions/workflows/ci-android.yml) 下载 FOSS 调试 APK。
 2. 安装 APK，授予蓝牙、通知及需要使用的其他权限。
 3. 若系统无法原生建立 AirPods 控制通道，或需要多设备身份与小米集成，安装 root / Xposed 环境，并在 LSPosed / Vector 中启用模块与对应作用域。
 4. 多设备使用时，在 App 设置中开启「模拟 Apple 设备」和「允许 Smart Routing 自动切换」，并启用耳机的「自动连接」。按提示重启蓝牙进程后重新连接。
 
-完整作用域、可选系统模块与故障排查见 [Android 安装指南](./android/README.md)。仅安装 APK 不会自动赋予系统权限或启用 Xposed。
+完整作用域与故障排查见 [Android 安装指南](./android/README.md)。仅安装 APK 不会自动赋予系统权限或启用 Xposed。
 
 ## 多设备切换
 
@@ -69,13 +69,7 @@ cd android
 ./gradlew :app:testFossDebugUnitTest :app:assembleFossDebug
 ```
 
-APK 输出到 `android/app/build/outputs/apk/foss/debug/app-foss-debug.apk`。构建可选系统模块：
-
-```sh
-./gradlew :app:zipDebugModule
-```
-
-模块输出到 `android/app/build/outputs/rootModuleZips/`。发行签名通过未提交的 `android/local.properties` 配置；同一签名的构建才能直接覆盖升级。
+APK 输出到 `android/app/build/outputs/apk/foss/debug/app-foss-debug.apk`。发行签名通过未提交的 `android/local.properties` 配置；同一签名的构建才能直接覆盖升级。
 
 ## 协议与贡献
 
